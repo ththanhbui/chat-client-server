@@ -1,7 +1,11 @@
 package server;
 
 import messages.*;
-import java.io.*;
+
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.net.Socket;
 import java.util.Random;
 
@@ -36,6 +40,7 @@ public class ClientHandler {
 
             InputStream in = socket.getInputStream();
 
+            // thread processing messages from client side
             fromClient = new Thread() {
                 @Override
                 public void run() {
@@ -71,27 +76,12 @@ public class ClientHandler {
                 }
             };
 
+            // thread processing messages from server side
             fromServer = new Thread() {
                 @Override
                 public void run() {
                     try {
                         ObjectOutputStream os = new ObjectOutputStream(socket.getOutputStream());
-
-                        /**
-                         * Sending information of GUIClient class
-                         */
-                        sendClass(GUIClient.class, os, null);
-                        sendClass(GUIClient.class, os, "1");
-//                        sendClass(GUIClient.class, os, "2");
-//                        sendClass(GUIClient.class, os, "3");
-
-                        /**
-                         * Sending information of GUIMessage class
-                         */
-                        sendClass(GUIMessage.class, os, null);
-
-                        os.writeObject(new GUIMessage());
-                        os.flush();
 
                         while (true) {
                             Message m = clientMessages.take();
@@ -109,29 +99,6 @@ public class ClientHandler {
             fromServer.setDaemon(true);
             fromServer.start();
 
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
-
-    private void sendClass(Class<?> clazz, ObjectOutputStream oos, String innerClass) {
-        try {
-            // Get the name of the class
-            String className = clazz.getName();
-            if (innerClass != null) {
-                className += "$" + innerClass;
-            }
-
-            // Convert to a full path
-            String path = clazz.getClassLoader().getResource(className.replaceAll("\\.", "/") + ".class").getPath();
-            File f = new File(path);
-            byte[] data = new byte[(int) f.length()];
-            new FileInputStream(f).read(data);
-
-            // Send the definition of the class
-            NewMessageType msg = new NewMessageType(className, data);
-            oos.writeObject(msg);
-            oos.flush();
         } catch (IOException e) {
             e.printStackTrace();
         }

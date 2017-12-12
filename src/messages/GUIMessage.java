@@ -1,7 +1,5 @@
 package messages;
 
-import server.GUIClient;
-
 import java.io.Serializable;
 
 public class GUIMessage extends Message implements Serializable {

@@ -79,7 +79,7 @@ public class ChatClient {
                             }
                         }
                     } catch (IOException | IllegalAccessException e) {
-                        System.out.println("Server has been closed");
+                        e.printStackTrace();
                     } catch (ClassNotFoundException cnf) {
                         System.err.println("Class not found");
                     }

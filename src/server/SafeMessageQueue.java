@@ -1,4 +1,3 @@
-// TODO: fix package name
 package server;
 
 public class SafeMessageQueue<T> implements MessageQueue<T> {
